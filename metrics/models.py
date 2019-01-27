@@ -1,16 +1,17 @@
-from datetime import timezone
-
 from django.db import models
 
-from rest_framework import serializers
+class BlockChain(models.Model):
+
+    blocks = models
 
 
 class Block(models.Model):
-    name = models.CharField('Event Name', max_length=120,default='')
-    event_date = models.DateTimeField('Event Date',default='')
-    venue = models.CharField(max_length=120, default='')
-    manager = models.CharField(max_length = 60, default='')
-    description = models.TextField(blank=True, default='')
+    b_hash = models.TextField('Block Hash', max_length=2048,default='')
+    p_hash = models.TextField('Previous Hash', max_length=2048, default='')
+    block_chain = models.ForeignKey(BlockChain, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return {"hash": self.b_hash, "prev_hash": self.p_hash}
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('b_hash',)
