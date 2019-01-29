@@ -1,16 +1,29 @@
 from rest_framework import serializers
 
-from metrics.models import Block
+from metrics.models import Block, BlockChain, Transaction
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
+
+
+class BlockChainSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlockChain
+        fields = '__all__'
+
 
 class BestBlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Block
         fields = ('id', 'b_hash', 'p_hash')
 
+
 class BlockSerializer(serializers.Serializer):
     b_hash = serializers.CharField(read_only=True)
     p_hash = serializers.CharField(read_only=True)
-
 
     def create(self, validated_block_data):
         """
