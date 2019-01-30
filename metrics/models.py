@@ -28,6 +28,11 @@ class Block(models.Model):
     def __str__(self):
         return self.b_hash
 
+    @classmethod
+    def create(cls, b_hash, p_hash, bloch_chain_name):
+        block = cls(b_hash=b_hash, p_hash=p_hash, block_chain=bloch_chain_name)
+        return block
+
     class Meta:
         ordering = ('b_hash',)
 
