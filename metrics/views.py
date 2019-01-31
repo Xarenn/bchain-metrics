@@ -139,3 +139,7 @@ class TransactionView(generics.ListAPIView):
                     Transaction.objects.create(t_hash=t_hash)
                 except KeyError as exc:
                     return JsonResponse("Bad request -> without transaction hash " + str(exc))
+
+
+class SynchronizeView(generics.ListAPIView):
+    pass

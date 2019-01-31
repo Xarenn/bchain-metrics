@@ -137,3 +137,35 @@ class BlockChainRestTest(APITestCase):
 
         self.assertEqual(block_chain_db['name'], block_chain_response['BlockChain']['name'])
         self.assertEqual(block_chain_db['reward'], block_chain_response['BlockChain']['reward'])
+
+    def test_get_default_chain(self):
+        url = "/api/v2/chain/"
+
+        block_chain_set = BlockChain.objects.all()
+        response = self.client.get(url, format='json')
+
+        self.assertNotEqual(len(response.content), 0)
+        self.assertEqual(len(block_chain_set), 1)
+
+        block_chain_db = BlockChainSerializer(block_chain_set[0]).data
+        block_chain_response = json.loads(response.content)
+
+        self.assertEqual(block_chain_db['name'], block_chain_response['BlockChain']['name'])
+        self.assertEqual(block_chain_db['reward'], block_chain_response['BlockChain']['reward'])
+
+    def test_get_blocks_from_chain(self):
+        url = "/api/v2/chain/"
+
+        response = self.client.get(url, format='json')
+        name_chain = json.loads(response.content)['BlockChain']['name']
+        chain = BlockChain.objects.get(name=name_chain)
+
+        blocks_db = Block.objects.all()
+        self.assertEqual(len(blocks_db), 5)
+
+        blocks_response = chain.block_set.all()
+        self.assertEqual(len(blocks_response), 5)
+
+        for i in range(0, len(blocks_db)):
+            self.assertEqual(blocks_db[i].b_hash, blocks_response[i].b_hash)
+            self.assertEqual(blocks_db[i].p_hash, blocks_response[i].p_hash)
