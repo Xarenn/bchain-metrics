@@ -9,6 +9,11 @@ class BlockChain(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def create(cls, name, reward):
+        block_chain = cls(name=name, reward=reward)
+        return block_chain
+
     class Meta:
         ordering = ('name',)
 
@@ -18,6 +23,11 @@ class Transaction(models.Model):
 
     def __str__(self):
         return self.t_hash[:24]
+
+    @classmethod
+    def create(cls, t_hash):
+        trx = cls(t_hash=t_hash)
+        return trx
 
 
 class Block(models.Model):
@@ -29,8 +39,8 @@ class Block(models.Model):
         return self.b_hash
 
     @classmethod
-    def create(cls, b_hash, p_hash, bloch_chain_name):
-        block = cls(b_hash=b_hash, p_hash=p_hash, block_chain=bloch_chain_name)
+    def create(cls, b_hash, p_hash, block_chain):
+        block = cls(b_hash=b_hash, p_hash=p_hash, block_chain=block_chain)
         return block
 
     class Meta:

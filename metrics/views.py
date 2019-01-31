@@ -31,9 +31,9 @@ class BlockView(generics.ListAPIView):
             queryset = self.get_queryset()
             serializer = BestBlockSerializer(queryset, many=True)
             try:
-                if kwargs['pk'] is not None:
+                if kwargs['id'] is not None:
                     try:
-                        serializer = BestBlockSerializer(self.get_block_by_id(kwargs['pk']))
+                        serializer = BestBlockSerializer(self.get_block_by_id(kwargs['id']))
                         return JsonResponse(serializer.data, safe=False, status=200)
                     except Block.DoesNotExist:
                         return JsonResponse("Block does not exist", status=404, safe=False)
@@ -74,7 +74,7 @@ class ChainView(generics.ListAPIView):
             block_chain_serializer = BlockChainSerializer(b_chain)
             chain_serializer = BestBlockSerializer(b_chain.block_set.all(), many=True)
         except BlockChain.DoesNotExist:
-            return JsonResponse("BlochChain doesnt found", status=404, safe=False)
+            return JsonResponse("BlockChain doesnt found", status=404, safe=False)
 
         return JsonResponse(({"BlockChain": block_chain_serializer.data,
                               "chain": chain_serializer.data}), status=200, safe=False)
