@@ -25,6 +25,7 @@ class BlockModelTest(TestCase):
         block_chain = BlockChain.objects.get(name="TestBlockChain")
         block_tested = Block.objects.get(block_chain=block_chain)
         block = Block(b_hash="test_block_hash", p_hash="test_prev_hash", block_chain=block_chain)
+
         self.assertEqual(block_tested.b_hash, block.b_hash)
         self.assertEqual(block_tested.p_hash, block.p_hash)
         self.assertEqual(block_tested.block_chain, block.block_chain)

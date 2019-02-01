@@ -4,6 +4,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 
 from django.views.generic import TemplateView
 from rest_framework import generics
+from rest_framework.utils import json
 
 from metrics.models import Block, BlockChain, Transaction
 from metrics.serializers import BestBlockSerializer, BlockChainSerializer, TransactionSerializer
@@ -101,7 +102,7 @@ class ChainView(generics.ListAPIView):
             except MultiValueDictKeyError:
                 return self.default_return_block_chain(queryset)
 
-    def valid_chain(self, request) -> JsonResponse:
+    def post(self, request, *args, **kwargs) -> JsonResponse:
         if request.method == 'POST':
             try:
                 chain = self.get_chain_by_name(request.data['chain_name'])
@@ -142,4 +143,62 @@ class TransactionView(generics.ListAPIView):
 
 
 class SynchronizeView(generics.ListAPIView):
-    pass
+
+    @staticmethod
+    def parse_block(req_data, chain):
+        try:
+            block_data = dict(req_data)
+            block = Block.create(b_hash=block_data['b_hash'],
+                                 p_hash=block_data['p_hash'],
+                                 block_chain=chain)
+            return block
+        except KeyError as exc:
+            return None
+
+    def get(self, request, *args, **kwargs) -> JsonResponse:
+        if request.method == 'GET':
+            return JsonResponse("OK", safe=False, status=200)
+
+        return JsonResponse("OK", safe=False, status=200)
+
+    # Last element -> the name of chain
+    # { "name": "Chain_Name" }
+    # if error occurs return None
+    @staticmethod
+    def filter_name(text):
+        try:
+            txt = text[len(text)-1]
+            return txt['name']
+        except KeyError as exc:
+            return None
+
+    def parse_blocks_from_data(self, chain, chain_data):
+        return [self.parse_block(block, chain) for block in chain_data]
+
+    def parse_blocks(self, chain, chain_data):
+        return list(filter(lambda block: block is not None, self.parse_blocks_from_data(chain, chain_data)))
+
+    def valid_blocks(self, blocks, chain):
+        validated_blocks = chain.block_set.all()
+        if any(block in validated_blocks for block in blocks):
+            return JsonResponse("Chain validated", safe=False, status=200)
+        else:
+            self.update_blocks(blocks, chain)
+            return JsonResponse("chain updated", safe=False, status=201)
+
+    @staticmethod
+    def update_blocks(blocks, chain):
+        chain.block_set.all().delete()
+        for block in reversed(blocks):
+            block.save()
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            chain_data = json.loads(request.data)
+            name = self.filter_name(chain_data)
+            if name is not None:
+                chain = BlockChain.objects.get(name=name)
+                blocks = self.parse_blocks(chain, chain_data)
+                return self.valid_blocks(blocks, chain)
+            else:
+                return JsonResponse("Bad request, doesn't have name ", status=400, safe=False)
