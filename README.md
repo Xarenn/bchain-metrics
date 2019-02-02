@@ -9,7 +9,7 @@ Use commands:
 
 or use Docker 
 <code> docker build . -t admin-block-chain</code>
-<code>docker run -d -t admin-block-chain:latest -p 5000:5000</code>
+<code>docker run -d -t admin-block-chain:latest -p 8000:8000</code>
 
 Written in Django and Django Rest Framework
 
