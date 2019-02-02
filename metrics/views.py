@@ -197,8 +197,11 @@ class SynchronizeView(generics.ListAPIView):
             chain_data = json.loads(request.data)
             name = self.filter_name(chain_data)
             if name is not None:
-                chain = BlockChain.objects.get(name=name)
-                blocks = self.parse_blocks(chain, chain_data)
-                return self.valid_blocks(blocks, chain)
+                try:
+                    chain = BlockChain.objects.get(name=name)
+                    blocks = self.parse_blocks(chain, chain_data)
+                    return self.valid_blocks(blocks, chain)
+                except BlockChain.DoesNotExist as exc:
+                    return JsonResponse("Chain not found", status=404, safe=False)
             else:
                 return JsonResponse("Bad request, doesn't have name ", status=400, safe=False)
