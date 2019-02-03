@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from metrics.models import Block, BlockChain, Transaction
+from metrics.models import Block, BlockChain, Transaction, Wallet
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -19,3 +19,9 @@ class BestBlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Block
         fields = ('id', 'b_hash', 'p_hash')
+
+
+class WalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
+        fields = ('__all__')

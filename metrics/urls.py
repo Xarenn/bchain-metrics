@@ -8,5 +8,6 @@ urlpatterns = [
     url('blocks/(?P<id>\d+)', views.BlockView.as_view()),
     url('chain/', views.ChainView.as_view()),
     url('transaction/', views.TransactionView.as_view()),
-    url('sync/', views.SynchronizeView.as_view())
+    url('sync/', views.SynchronizeView.as_view()),
+    url('wallet/(?P<address>)', views.WalletView.as_view())
 ]

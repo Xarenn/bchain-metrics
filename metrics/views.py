@@ -6,8 +6,8 @@ from django.views.generic import TemplateView
 from rest_framework import generics
 from rest_framework.utils import json
 
-from metrics.models import Block, BlockChain, Transaction
-from metrics.serializers import BestBlockSerializer, BlockChainSerializer, TransactionSerializer
+from metrics.models import Block, BlockChain, Transaction, Wallet
+from metrics.serializers import BestBlockSerializer, BlockChainSerializer, TransactionSerializer, WalletSerializer
 
 
 class BlockView(generics.ListAPIView):
@@ -205,3 +205,37 @@ class SynchronizeView(generics.ListAPIView):
                     return JsonResponse("Chain not found", status=404, safe=False)
             else:
                 return JsonResponse("Bad request, doesn't have name ", status=400, safe=False)
+
+
+class WalletView(generics.ListAPIView):
+
+    @staticmethod
+    def get_wallet_by_address(address):
+        try:
+            return Wallet.objects.get(wallet_hash=address)
+        except Wallet.DoesNotExist:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            try:
+                if kwargs['address'] is not None:
+                    wallet = self.get_wallet_by_address(args['address'])
+                    if wallet is not None:
+                        wallet_data = WalletSerializer(wallet, many=False).data
+                        return JsonResponse(wallet_data, safe=False, status=200)
+                    else:
+                        return JsonResponse("Wallet not found", safe=False, status=404)
+                else:
+                    return JsonResponse("Wallet not found", safe=False, status=400)
+            except KeyError as exc:
+                return JsonResponse("Address not found", safe=False, status=404)
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            try:
+                address = request.data['pub_key']
+                Wallet.objects.create(wallet_hash=address, amount=0)
+                return JsonResponse("Wallet created", safe=False, status=200)
+            except KeyError as exc:
+                return JsonResponse("Bad request"+str(exc), safe=False, status=400)

@@ -18,8 +18,24 @@ class BlockChain(models.Model):
         ordering = ('name',)
 
 
+class Wallet(models.Model):
+    wallet_hash = models.TextField("Wallet Address", max_length=2048, default='')
+    amount = models.TextField("Wallet amount", default=0)
+
+    def __str__(self):
+        return self.wallet_hash[:24]
+
+    @classmethod
+    def create(cls, wallet_hash, amount):
+        return cls(wallet_hash=wallet_hash, amount=amount)
+
+    class Meta:
+        ordering = ('wallet_hash',)
+
+
 class Transaction(models.Model):
     t_hash = models.TextField('Transaction hash', max_length=2048, default='')
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return self.t_hash[:24]
