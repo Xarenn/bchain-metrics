@@ -14,7 +14,7 @@ or use Docker
 Written in Django and Django Rest Framework
 
 # How it works
-Metrics is a server in Python3 which allows communication with the block-chain server and save their state, manage it (of course only in the admin state because block-chain server has own state of chain and it has proof of work implementation)
+Metrics is a server in Python3 which allows to communication with the block-chain server and save their state, manage it (of course only in the admin state because block-chain server has own state of chain and it has a proof of work implementation)
 
 Admin page have search item where we can find blocks by name of chain etc..
 
